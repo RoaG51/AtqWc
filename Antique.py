@@ -178,13 +178,13 @@ def Atq_Menu(db,intcmd,user,flag):
     this_player = list(db.select('players' , where="id = \'"+user+"\'"))
     if not this_player:
         if flag:
-    		return u"欢迎使用古董局中局鉴宝助手！\n请按以下提示输入命令操作：\n 创建房间：游戏人数（6-8）\n 加入房间：6位房间号"+help_text
-    	elif 6 <= intcmd <= 8:
-        	return room_create(db,intcmd,user)
+    	    return u"欢迎使用古董局中局鉴宝助手！\n请按以下提示输入命令操作：\n 创建房间：游戏人数（6-8）\n 加入房间：6位房间号"+help_text
+        elif 6 <= intcmd <= 8:
+            return room_create(db,intcmd,user)
         elif 100000 <= intcmd <= 999999:
-        	return room_join(db,intcmd,user)
+            return room_join(db,intcmd,user)
         else:
-        	return Atq_Menu(db,intcmd,user,1)
+            return Atq_Menu(db,intcmd,user,1)
     else:
         room_id = this_player[0]["room"]
         res_room = list(db.select('rooms' , where="id = "+str(room_id)+""))
