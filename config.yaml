@@ -1,0 +1,13 @@
+name: 古董局中局测试版
+version: 1
+
+libraries:
+- name: webpy 
+  version: "0.36"
+#SAE下使用webpy框架
+
+- name: lxml
+  version: "2.3.4"
+#lxml库用于处理xml文件
+#本文件格式及预装模块与版本参见SAE技术文档“应用配置”部分
+...
