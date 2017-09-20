@@ -1238,17 +1238,17 @@ def Atq_Menu(db,intcmd,user,flag):
             if flag:
                 if not this_player[0]["player_obj"]:
                     if 1<= this_player[0]["role"] <= 4 or this_player[0]["role"] == 8:
-                        return u"你是"+atq_role(this_player[0]["role"])+u"，请按要求选择老朝奉，所有玩家输入完成后，房主输入0继续游戏" + pro_text + u"\n 继续游戏：0【房主操作】"+help_text
+                        return u"你是"+atq_role(this_player[0]["role"])+u"，请按要求选择老朝奉，所有玩家输入完成后，房主输入0继续游戏" + pro_text + help_text
                     elif this_player[0]["role"] == 5:
-                        return u"你是"+atq_role(this_player[0]["role"])+u"，请按要求选择许愿，所有玩家输入完成后，房主输入0继续游戏" + pro_text + u"\n 继续游戏：0【房主操作】"+help_text
+                        return u"你是"+atq_role(this_player[0]["role"])+u"，请按要求选择许愿，所有玩家输入完成后，房主输入0继续游戏" + pro_text + help_text
                     elif this_player[0]["role"] == 6:
-                        return u"你是"+atq_role(this_player[0]["role"])+u"，请按要求选择方震，所有玩家输入完成后，房主输入0继续游戏" + pro_text + u"\n 继续游戏：0【房主操作】"+help_text
+                        return u"你是"+atq_role(this_player[0]["role"])+u"，请按要求选择方震，所有玩家输入完成后，房主输入0继续游戏" + pro_text + help_text
                     elif this_player[0]["role"] == 7:
-                        return u"你是"+atq_role(this_player[0]["role"])+u"，请按要求任选1名角色，所有玩家输入完成后，房主输入0继续游戏" + pro_text + u"\n 继续游戏：0【房主操作】"+help_text
+                        return u"你是"+atq_role(this_player[0]["role"])+u"，请按要求任选1名角色，所有玩家输入完成后，房主输入0继续游戏" + pro_text + help_text
                     else:
                         return u"你是"+atq_role(this_player[0]["role"])+u"，未知鉴人目标"+help_text
                 elif host_id == user:
-                	if 1<= this_player[0]["role"] <= 4 or this_player[0]["role"] == 8:
+                    if 1<= this_player[0]["role"] <= 4 or this_player[0]["role"] == 8:
                         return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家为老朝奉，可以输入对应编号更改目标\n请等待所有玩家完成选择\n 继续游戏：0"+help_text
                     elif this_player[0]["role"] == 5:
                         return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家为许愿，可以输入对应编号更改目标\n请等待所有玩家完成选择\n 继续游戏：0"+help_text
@@ -1257,9 +1257,7 @@ def Atq_Menu(db,intcmd,user,flag):
                     elif this_player[0]["role"] == 7:
                         return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家，请等待所有玩家完成选择\n 继续游戏：0"+help_text
                     else:
-                        return u"你是"+atq_role(this_player[0]["role"])+u"，未知鉴人目标"+help_text
-                else:
-                    return u"你已选择："+atq_color(this_player[0]["color"])+u"，可以输入对应编号更改颜色\n所有玩家输入完成后，房主输入0继续游戏"+help_text         
+                        return u"你是"+atq_role(this_player[0]["role"])+u"，未知鉴人目标"+help_text        
                 else:
                     if 1<= this_player[0]["role"] <= 4 or this_player[0]["role"] == 8:
                         return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家为老朝奉，可以输入对应编号更改目标\n所有玩家输入完成后，房主输入0继续游戏" +help_text
