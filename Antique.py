@@ -44,7 +44,7 @@ def Atq_History(db,user):
         kr2 = this_player[0]["r2_skill_result"]
         k3 = this_player[0]["r3_skill_obj"]
         kr3 = this_player[0]["r3_skill_result"]
-        history_text = u"你在房间："+str(room_id)+u"\n"
+        history_text = u""
         if not color:
         	history_text = history_text+u"你尚未选择颜色！"
         else:
@@ -174,17 +174,17 @@ def Atq_Exit(db,user):
 
 def Atq_Menu(db,intcmd,user,flag):
     '流程命令模块，flag为1时只打印提示，flag为0时才执行操作'
-    help_text = u"\n 帮助信息：？\n 操作记录：，\n 退出房间：！"
+    help_text = u""
     this_player = list(db.select('players' , where="id = \'"+user+"\'"))
     if not this_player:
         if flag:
-    	    return u"欢迎使用古董局中局鉴宝助手！\n请按以下提示输入命令操作：\n 创建房间：游戏人数（6-8）\n 加入房间：6位房间号"+help_text
-        elif 6 <= intcmd <= 8:
-            return room_create(db,intcmd,user)
+    		return u"欢迎使用古董局中局鉴宝助手！\n请按以下提示输入命令操作：\n 创建房间：游戏人数（6-8）\n 加入房间：6位房间号"+help_text
+    	elif 6 <= intcmd <= 8:
+        	return room_create(db,intcmd,user)
         elif 100000 <= intcmd <= 999999:
-            return room_join(db,intcmd,user)
+        	return room_join(db,intcmd,user)
         else:
-            return Atq_Menu(db,intcmd,user,1)
+        	return Atq_Menu(db,intcmd,user,1)
     else:
         room_id = this_player[0]["room"]
         res_room = list(db.select('rooms' , where="id = "+str(room_id)+""))
@@ -1611,5 +1611,3 @@ def atq_winvp(num):
         return 6
     else:
         return error
-
-    

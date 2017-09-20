@@ -54,14 +54,54 @@ class WechatInterface:
         count = int(results[0]["age"])
         count += 1
         num_updated = db.update('test', where="id > 10", age = str(count) )
+        
+        if msgType == 'event':
+            mscontent = xml.find("Event").text
+            if mscontent == "subscribe":
+                replayText = u'感谢你关注古董局中局桌游，你有什么事情都可以给我说哦...但是回不回就是我的事啦。'
+                return self.render.reply_text(fromUser,toUser,int(time.time()),replayText)
+            
+           #微信菜单管理
+            cdcontent = xml.find("Event").text
+            if cdcontent == "CLICK":
+                keycontent = xml.find("EventKey").text
+                if keycontent == u'盒闪淘宝':
+                    replayText = u'【盒中闪电】，复制这条信息￥XKUE0VIbWwx￥后打开手机淘宝'
+                    return self.render.reply_text(fromUser,toUser,int(time.time()),replayText)
+                if keycontent == u'创建房间':
+                    replayText = u'请输入数字“6-8”选择房间人数'
+                    return self.render.reply_text(fromUser,toUser,int(time.time()),replayText)
+                if keycontent == u'退出房间':
+                    msg = Antique.Menu(db,"!",fromUser)
+                    return self.render.reply_text(fromUser,toUser,int(time.time()),u""+msg)
+                if keycontent == u'刷新':
+                    msg = Antique.Menu(db,"老齐真帅",fromUser)
+                    return self.render.reply_text(fromUser,toUser,int(time.time()),u""+msg)
+                if keycontent == u'历史信息':
+                    msg = Antique.Menu(db,",",fromUser)
+                    return self.render.reply_text(fromUser,toUser,int(time.time()),u""+msg)
+                if keycontent == u'帮助信息':
+                    msg = Antique.Menu(db,"?",fromUser)
+                    return self.render.reply_text(fromUser,toUser,int(time.time()),u""+msg)
+                if keycontent == u'加入我们':
+                    replayText = u'''《古董局中局》桌游玩家QQ群：596772185
+《古董局中局》桌游玩家微信群已经超过100人，可以联系客服姐姐拉你进去哦'''
+                    return self.render.reply_text(fromUser,toUser,int(time.time()),replayText)
+                if keycontent == u'客服':
+                    replayText = u'''《古董局中局》微信客服号：18982287779
+《古董局中局》桌游客服QQ号：2943517039
+可爱的客服小姐姐马上就来哟'''
+                    return self.render.reply_text(fromUser,toUser,int(time.time()),replayText)
+                
+                
         if msgType == "text":
             msg = Antique.Menu(db,content,fromUser)
-            return self.render.reply_text(fromUser,toUser,int(time.time()),u"第"+str(count)+u"次调用：\n"+msg)
+            return self.render.reply_text(fromUser,toUser,int(time.time()),u""+msg)
         else:
-            return self.render.reply_text(fromUser,toUser,int(time.time()),u"第"+str(count)+u"次调用：\n"+u"本助手目前只能识别文本消息，请重新输入命令\n")
+            return self.render.reply_text(fromUser,toUser,int(time.time()),u""+u"本助手目前只能识别文本消息，请重新输入命令\n")
+        
     
     	#db.insert('test', id = 123123, age = '16', gender = '女')
         #num_updated = db.update('test', where="id > 10", age = "20")
         #num_updated = db.delete('test', where="id = 123123")
         #results = list(db.select('test'))
-    
