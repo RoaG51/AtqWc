@@ -210,9 +210,11 @@ def Atq_Menu(db,intcmd,user,flag):
         elif game_state == 1:
             if flag:
                 if not this_player[0]["color"]:
-                    return u"请按要求输入自己的颜色，所有玩家输入完成后，房主输入0继续游戏\n 选择红色：1\n 选择橙色：2\n 选择黄色：3\n 选择蓝色：4\n 选择绿色：5\n 选择紫色：6\n 选择黑色：7\n 选择白色：8\n 继续游戏：0【房主操作】"+help_text
+                    return u"请按要求输入自己的颜色，所有玩家输入完成后，房主输入0继续游戏\n 选择红色：1\n 选择橙色：2\n 选择黄色：3\n 选择蓝色：4\n 选择绿色：5\n 选择紫色：6\n 选择黑色：7\n 选择白色：8"+help_text
+                elif host_id == user:
+                    return u"你已选择："+atq_color(this_player[0]["color"])+u"，可以输入对应编号更改颜色\n请等待所有玩家完成选择\n 继续游戏：0"+help_text
                 else:
-                    return u"你已选择："+atq_color(this_player[0]["color"])+u"，所有玩家输入完成后，房主输入0继续游戏\n 选择红色：1\n 选择橙色：2\n 选择黄色：3\n 选择蓝色：4\n 选择绿色：5\n 选择紫色：6\n 选择黑色：7\n 选择白色：8\n 继续游戏：0【房主操作】"+help_text
+                    return u"你已选择："+atq_color(this_player[0]["color"])+u"，可以输入对应编号更改颜色\n所有玩家输入完成后，房主输入0继续游戏"+help_text    
             elif 1 <= intcmd <= 8:
                 db.update('players',  where="id = \'"+user+"\'", color = intcmd )
                 return u"选择"+atq_color(intcmd)+u"成功！\n"+Atq_Menu(db,intcmd,user,1)
@@ -242,8 +244,10 @@ def Atq_Menu(db,intcmd,user,flag):
                 pro_text = pro_text + u"\n 继续游戏：0【房主操作】"    
                 if not this_player[0]["role"]:
                     return u"请按要求输入自己的角色，"+pro_text + help_text
+                elif host_id == user:
+                    return u"你已选择："+atq_role(this_player[0]["role"])+u"，可以输入对应编号更改角色\n请等待所有玩家完成选择\n 继续游戏：0"+help_text
                 else:
-                    return u"你已选择："+atq_role(this_player[0]["role"])+u"，"+pro_text + help_text
+                    return u"你已选择："+atq_role(this_player[0]["role"])+u"，可以输入对应编号更改角色\n所有玩家输入完成后，房主输入0继续游戏"+help_text
             elif 1 <= intcmd <= num_room:
                 db.update('players',  where="id = \'"+user+"\'", role = intcmd )
                 return u"选择"+atq_role(intcmd)+u"成功！\n"+Atq_Menu(db,intcmd,user,1)
@@ -528,7 +532,10 @@ def Atq_Menu(db,intcmd,user,flag):
         #第1轮等待发言    
         elif game_state == 6:
             if flag:
-                return u"请开始发言！发言阶段结束后，房主输入0继续游戏\n 继续游戏：0【房主操作】"+help_text
+            	if host_id == user:
+                    return u"发言阶段，请等待发言阶段结束\n 继续游戏：0"+help_text
+                else:
+                    return u"进入发言阶段，发言阶段结束后，房主输入0继续游戏"+help_text
             elif host_id == user and intcmd == 0 :
                 #更新房间状态
                 db.update('rooms', where="id = "+str(room_id)+"", state = game_state + 1 )
@@ -558,7 +565,7 @@ def Atq_Menu(db,intcmd,user,flag):
                             break
                     return u"本轮票数最高的宝物为："+atq_atq(voted_atq[0])+u"\n请按下列提示选择票数第2高的宝物：\n "+atq_atq(atq[0][0])+u"：1\n "+atq_atq(atq[1][0])+u"：2\n "+atq_atq(atq[2][0])+u"：3\n "+help_text
                 elif game_state == 9:
-                    return u"本轮票数最高的宝物为："+atq_atq(voted_atq[0])+u"\n本轮票数第2高的宝物为："+atq_atq(voted_atq[1])+u"\n请输入0继续游戏，输入1重新选择宝物\n 继续游戏：0\n 重新选择：1"+help_text
+                    return u"本轮票数最高的宝物为："+atq_atq(voted_atq[0])+u"\n本轮票数第2高的宝物为："+atq_atq(voted_atq[1])+u"\n 继续游戏：0\n 重新选择：1"+help_text
                 else:
                     return u"房间状态号越界"
             else:
@@ -828,7 +835,10 @@ def Atq_Menu(db,intcmd,user,flag):
         #第2轮等待发言    
         elif game_state == 13:
             if flag:
-                return u"请开始发言！发言阶段结束后，房主输入0继续游戏\n 继续游戏：0【房主操作】"+help_text
+                if host_id == user:
+                    return u"发言阶段，请等待发言阶段结束\n 继续游戏：0"+help_text
+                else:
+                    return u"进入发言阶段，发言阶段结束后，房主输入0继续游戏"+help_text
             elif host_id == user and intcmd == 0:
                 #更新房间状态
                 db.update('rooms', where="id = "+str(room_id)+"", state = game_state + 1 )
@@ -858,7 +868,7 @@ def Atq_Menu(db,intcmd,user,flag):
                             break
                     return u"本轮票数最高的宝物为："+atq_atq(voted_atq[0])+u"\n请按下列提示选择票数第2高的宝物：\n "+atq_atq(atq[0][0])+u"：1\n "+atq_atq(atq[1][0])+u"：2\n "+atq_atq(atq[2][0])+u"：3\n "+help_text
                 elif game_state == 16:
-                    return u"本轮票数最高的宝物为："+atq_atq(voted_atq[0])+u"\n本轮票数第2高的宝物为："+atq_atq(voted_atq[1])+u"\n请输入0继续游戏，输入1重新选择宝物\n 继续游戏：0\n 重新选择：1"+help_text
+                    return u"本轮票数最高的宝物为："+atq_atq(voted_atq[0])+u"\n本轮票数第2高的宝物为："+atq_atq(voted_atq[1])+u"\n 继续游戏：0\n 重新选择：1"+help_text
                 else:
                     return u"房间状态号越界"
             else:
@@ -1128,7 +1138,10 @@ def Atq_Menu(db,intcmd,user,flag):
         #第3轮等待发言    
         elif game_state == 20:
             if flag:
-                return u"请开始发言！发言阶段结束后，房主输入0继续游戏\n 继续游戏：0【房主操作】"+help_text
+                if host_id == user:
+                    return u"发言阶段，请等待发言阶段结束\n 继续游戏：0"+help_text
+                else:
+                    return u"进入发言阶段，发言阶段结束后，房主输入0继续游戏"+help_text
             elif host_id == user and intcmd == 0:
                 #更新房间状态
                 db.update('rooms', where="id = "+str(room_id)+"", state = game_state + 1 )
@@ -1158,7 +1171,7 @@ def Atq_Menu(db,intcmd,user,flag):
                             break
                     return u"本轮票数最高的宝物为："+atq_atq(voted_atq[0])+u"\n请按下列提示选择票数第2高的宝物：\n "+atq_atq(atq[0][0])+u"：1\n "+atq_atq(atq[1][0])+u"：2\n "+atq_atq(atq[2][0])+u"：3\n "+help_text
                 elif game_state == 23:
-                    return u"本轮票数最高的宝物为："+atq_atq(voted_atq[0])+u"\n本轮票数第2高的宝物为："+atq_atq(voted_atq[1])+u"\n请输入0继续游戏，输入1重新选择宝物\n 继续游戏：0\n 重新选择：1"+help_text
+                    return u"本轮票数最高的宝物为："+atq_atq(voted_atq[0])+u"\n本轮票数第2高的宝物为："+atq_atq(voted_atq[1])+u"\n 继续游戏：0\n 重新选择：1"+help_text
                 else:
                     return u"房间状态号越界"
             else:
@@ -1234,15 +1247,28 @@ def Atq_Menu(db,intcmd,user,flag):
                         return u"你是"+atq_role(this_player[0]["role"])+u"，请按要求任选1名角色，所有玩家输入完成后，房主输入0继续游戏" + pro_text + u"\n 继续游戏：0【房主操作】"+help_text
                     else:
                         return u"你是"+atq_role(this_player[0]["role"])+u"，未知鉴人目标"+help_text
+                elif host_id == user:
+                	if 1<= this_player[0]["role"] <= 4 or this_player[0]["role"] == 8:
+                        return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家为老朝奉，可以输入对应编号更改目标\n请等待所有玩家完成选择\n 继续游戏：0"+help_text
+                    elif this_player[0]["role"] == 5:
+                        return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家为许愿，可以输入对应编号更改目标\n请等待所有玩家完成选择\n 继续游戏：0"+help_text
+                    elif this_player[0]["role"] == 6:
+                        return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家为方震，可以输入对应编号更改目标\n请等待所有玩家完成选择\n 继续游戏：0"+help_text
+                    elif this_player[0]["role"] == 7:
+                        return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家，请等待所有玩家完成选择\n 继续游戏：0"+help_text
+                    else:
+                        return u"你是"+atq_role(this_player[0]["role"])+u"，未知鉴人目标"+help_text
+                else:
+                    return u"你已选择："+atq_color(this_player[0]["color"])+u"，可以输入对应编号更改颜色\n所有玩家输入完成后，房主输入0继续游戏"+help_text         
                 else:
                     if 1<= this_player[0]["role"] <= 4 or this_player[0]["role"] == 8:
-                        return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家为老朝奉，所有玩家输入完成后，房主输入0继续游戏" + pro_text + u"\n 继续游戏：0【房主操作】"+help_text
+                        return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家为老朝奉，可以输入对应编号更改目标\n所有玩家输入完成后，房主输入0继续游戏" +help_text
                     elif this_player[0]["role"] == 5:
-                        return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家为许愿，所有玩家输入完成后，房主输入0继续游戏" + pro_text + u"\n 继续游戏：0【房主操作】"+help_text
+                        return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家为许愿，可以输入对应编号更改目标\n所有玩家输入完成后，房主输入0继续游戏"+help_text
                     elif this_player[0]["role"] == 6:
-                        return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家为方震，所有玩家输入完成后，房主输入0继续游戏" + pro_text + u"\n 继续游戏：0【房主操作】"+help_text
+                        return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家为方震，可以输入对应编号更改目标\n所有玩家输入完成后，房主输入0继续游戏"+help_text
                     elif this_player[0]["role"] == 7:
-                        return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家，所有玩家输入完成后，房主输入0继续游戏" + pro_text + u"\n 继续游戏：0【房主操作】"+help_text
+                        return u"你是"+atq_role(this_player[0]["role"])+u"你已选择："+atq_color(this_player[0]["player_obj"])+u"玩家\n所有玩家输入完成后，房主输入0继续游戏"+help_text
                     else:
                         return u"你是"+atq_role(this_player[0]["role"])+u"，未知鉴人目标"+help_text
             elif (intcmd in player_list):

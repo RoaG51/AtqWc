@@ -101,7 +101,3 @@ class WechatInterface:
             return self.render.reply_text(fromUser,toUser,int(time.time()),u""+u"本助手目前只能识别文本消息，请重新输入命令\n")
         
     
-    	#db.insert('test', id = 123123, age = '16', gender = '女')
-        #num_updated = db.update('test', where="id > 10", age = "20")
-        #num_updated = db.delete('test', where="id = 123123")
-        #results = list(db.select('test'))
