@@ -50,10 +50,6 @@ class WechatInterface:
         fromUser=xml.xpath("FromUserName")[0].text
         toUser=xml.xpath("ToUserName")[0].text
         db = Mysql._create_db()
-        results = list(db.select('test'))
-        count = int(results[0]["age"])
-        count += 1
-        num_updated = db.update('test', where="id > 10", age = str(count) )
         
         if msgType == 'event':
             mscontent = xml.find("Event").text
@@ -68,20 +64,20 @@ class WechatInterface:
                 if keycontent == u'盒闪淘宝':
                     replayText = u'【盒中闪电】，复制这条信息￥XKUE0VIbWwx￥后打开手机淘宝'
                     return self.render.reply_text(fromUser,toUser,int(time.time()),replayText)
-                if keycontent == u'创建房间':
-                    replayText = u'请输入数字“6-8”选择房间人数'
-                    return self.render.reply_text(fromUser,toUser,int(time.time()),replayText)
-                if keycontent == u'退出房间':
-                    msg = Antique.Menu(db,"!",fromUser)
+                if keycontent == u'开始游戏':
+                    msg = Antique.Menu(db,"!",fromUser,3)
                     return self.render.reply_text(fromUser,toUser,int(time.time()),u""+msg)
-                if keycontent == u'刷新':
-                    msg = Antique.Menu(db,"老齐真帅",fromUser)
+                if keycontent == u'退出游戏':
+                    msg = Antique.Menu(db,"!",fromUser,4)
+                    return self.render.reply_text(fromUser,toUser,int(time.time()),u""+msg)
+                if keycontent == u'刷新信息':
+                    msg = Antique.Menu(db,"老齐真帅",fromUser,0)
                     return self.render.reply_text(fromUser,toUser,int(time.time()),u""+msg)
                 if keycontent == u'历史信息':
-                    msg = Antique.Menu(db,",",fromUser)
+                    msg = Antique.Menu(db,",",fromUser,2)
                     return self.render.reply_text(fromUser,toUser,int(time.time()),u""+msg)
                 if keycontent == u'帮助信息':
-                    msg = Antique.Menu(db,"?",fromUser)
+                    msg = Antique.Menu(db,"?",fromUser,1)
                     return self.render.reply_text(fromUser,toUser,int(time.time()),u""+msg)
                 if keycontent == u'加入我们':
                     replayText = u'''《古董局中局》桌游玩家QQ群：596772185
@@ -95,7 +91,7 @@ class WechatInterface:
                 
                 
         if msgType == "text":
-            msg = Antique.Menu(db,content,fromUser)
+            msg = Antique.Menu(db,content,fromUser,0)
             return self.render.reply_text(fromUser,toUser,int(time.time()),u""+msg)
         else:
             return self.render.reply_text(fromUser,toUser,int(time.time()),u""+u"本助手目前只能识别文本消息，请重新输入命令\n")

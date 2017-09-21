@@ -5,21 +5,26 @@ import random
 #老齐修改符，测试结束后搜索“老齐修改符”逐条修改
 
 #流程控制函数
-def Menu(db,command,user):
+def Menu(db,command,user,switch):
     '主菜单函数，区分全局命令与流程命令'
     intcmd = 99
     if command.isdigit():
-    	intcmd = int(command)
-    if command == u"？" or command == "?" :
-    	return Atq_Help(db,user)
-    elif command == u"，" or command == ",":
-    	return Atq_History(db,user)
-    elif command == u"！" or command == "!":
-    	return Atq_Exit(db,user)
+        intcmd = int(command)
+    #if command == u"？" or command == "?" :
+    if switch == 1:
+        return Atq_Help(db,user)
+    #elif command == u"，" or command == ",":
+    elif switch == 2:
+        return Atq_History(db,user)
+    #elif command == u"！" or command == "!":
+    elif switch == 3:
+        return Atq_Start(db,user)
+    elif switch == 4:
+        return Atq_Exit(db,user)
     elif (0 <= intcmd <= 8) or (100000 <= intcmd <= 999999):
-    	return Atq_Menu(db,intcmd,user,0)
+        return Atq_Menu(db,intcmd,user,0)
     else:
-    	return Atq_Menu(db,intcmd,user,1)
+        return Atq_Menu(db,intcmd,user,1)
     
 def Atq_Help(db,user):
     return u"感谢查看，更多帮助信息请查看游戏挡板内侧说明"
@@ -46,15 +51,15 @@ def Atq_History(db,user):
         kr3 = this_player[0]["r3_skill_result"]
         history_text = u""
         if not color:
-        	history_text = history_text+u"你尚未选择颜色！"
+            history_text = history_text+u"你尚未选择颜色！"
         else:
             history_text = history_text+u"你是"+atq_color(color)+u"玩家"
         if not role:
-        	history_text = history_text+u"\n你尚未选择角色！\n"
+            history_text = history_text+u"\n你尚未选择角色！\n"
         else:
             history_text = history_text+atq_role(role)+u"\n"
         if mate:
-        	history_text = history_text+u"你的队友是"+atq_color(mate)+u"玩家\n"
+            history_text = history_text+u"你的队友是"+atq_color(mate)+u"玩家\n"
         if flag:
             history_text = history_text+u"你当前轮已行动\n"
         else:
@@ -151,6 +156,14 @@ def Atq_History(db,user):
                 pass     
     return history_text
 
+def Atq_Start(db,user):
+    '开始游戏函数'
+    results = list(db.select('players' , where="id = \'"+user+"\'"))
+    if not results:
+        return u"欢迎使用古董局中局鉴宝助手！\n请按以下提示输入命令操作：\n 创建房间：游戏人数（6-8）\n 加入房间：6位房间号"
+    else:
+        return u"你已在游戏中！"
+
 def Atq_Exit(db,user):
     '退出房间函数'
     results = list(db.select('players' , where="id = \'"+user+"\'"))
@@ -178,13 +191,13 @@ def Atq_Menu(db,intcmd,user,flag):
     this_player = list(db.select('players' , where="id = \'"+user+"\'"))
     if not this_player:
         if flag:
-    		return u"欢迎使用古董局中局鉴宝助手！\n请按以下提示输入命令操作：\n 创建房间：游戏人数（6-8）\n 加入房间：6位房间号"+help_text
-    	elif 6 <= intcmd <= 8:
-        	return room_create(db,intcmd,user)
+            return u"欢迎使用古董局中局鉴宝助手！\n请按以下提示输入命令操作：\n 创建房间：游戏人数（6-8）\n 加入房间：6位房间号"+help_text
+        elif 6 <= intcmd <= 8:
+            return room_create(db,intcmd,user)
         elif 100000 <= intcmd <= 999999:
-        	return room_join(db,intcmd,user)
+            return room_join(db,intcmd,user)
         else:
-        	return Atq_Menu(db,intcmd,user,1)
+            return Atq_Menu(db,intcmd,user,1)
     else:
         room_id = this_player[0]["room"]
         res_room = list(db.select('rooms' , where="id = "+str(room_id)+""))
@@ -197,7 +210,10 @@ def Atq_Menu(db,intcmd,user,flag):
         #进入房间等待房主开始
         if game_state == 0:
             if flag:
-                return u"请等待房间人满后房主输入0开始游戏\n房间号："+str(room_id)+u"\n所需游戏人数："+str(num_room)+u"\n当前游戏人数："+str(num_players)+u"\n 开始游戏：0【房主操作】"+help_text
+                if host_id == user:
+                    return u"请等待房间人满\n房间号："+str(room_id)+u"\n所需游戏人数："+str(num_room)+u"\n当前游戏人数："+str(num_players)+u"\n 开始游戏：0"+help_text
+                else:
+                    return u"请等待房间人满后房主输入0开始游戏\n房间号："+str(room_id)+u"\n所需游戏人数："+str(num_room)+u"\n当前游戏人数："+str(num_players)+help_text
             #老齐修改符，测试完成后改成下面的一行判断
             elif host_id == user and intcmd == 0 :
             #elif host_id == user and intcmd == 0 and num_players >= num_room:
@@ -231,8 +247,8 @@ def Atq_Menu(db,intcmd,user,flag):
                     return u"有玩家尚未选择或选择了相同的颜色，请选错的玩家重新选择！\n"+Atq_Menu(db,intcmd,user,1)
                 else:
                     #更新房间状态，并设置起始玩家
-                	db.update('rooms', where="id = "+str(room_id)+"", state = game_state + 1 ,cur_player = random.choice(color_list) )
-                	return u"颜色选择完成！\n"+Atq_Menu(db,intcmd,user,1)
+                    db.update('rooms', where="id = "+str(room_id)+"", state = game_state + 1 ,cur_player = random.choice(color_list) )
+                    return u"颜色选择完成！\n"+Atq_Menu(db,intcmd,user,1)
             else:
                 return Atq_Menu(db,intcmd,user,1)
         #选择身份
@@ -306,10 +322,10 @@ def Atq_Menu(db,intcmd,user,flag):
         #第1轮鉴宝    
         elif 3<= game_state <=5 :
             atq = [
-                	[ res_room[0]["a1_rd"],res_room[0]["a1_tf"],res_room[0]["a1_state"]],
-                	[ res_room[0]["a2_rd"],res_room[0]["a2_tf"],res_room[0]["a2_state"]],
-                	[ res_room[0]["a3_rd"],res_room[0]["a3_tf"],res_room[0]["a3_state"]],
-                	[ res_room[0]["a4_rd"],res_room[0]["a4_tf"],res_room[0]["a4_state"]],
+                    [ res_room[0]["a1_rd"],res_room[0]["a1_tf"],res_room[0]["a1_state"]],
+                    [ res_room[0]["a2_rd"],res_room[0]["a2_tf"],res_room[0]["a2_state"]],
+                    [ res_room[0]["a3_rd"],res_room[0]["a3_tf"],res_room[0]["a3_state"]],
+                    [ res_room[0]["a4_rd"],res_room[0]["a4_tf"],res_room[0]["a4_state"]],
                   ]
             if flag:
                 if this_player[0]["color"] != cur_player:
@@ -532,7 +548,7 @@ def Atq_Menu(db,intcmd,user,flag):
         #第1轮等待发言    
         elif game_state == 6:
             if flag:
-            	if host_id == user:
+                if host_id == user:
                     return u"发言阶段，请等待发言阶段结束\n 继续游戏：0"+help_text
                 else:
                     return u"进入发言阶段，发言阶段结束后，房主输入0继续游戏"+help_text
@@ -545,10 +561,10 @@ def Atq_Menu(db,intcmd,user,flag):
         #第1轮录入鉴宝结果    
         elif 7 <= game_state <= 9 :
             atq = [
-                	[ res_room[0]["a1_rd"],res_room[0]["a1_tf"]],
-                	[ res_room[0]["a2_rd"],res_room[0]["a2_tf"]],
-                	[ res_room[0]["a3_rd"],res_room[0]["a3_tf"]],
-                	[ res_room[0]["a4_rd"],res_room[0]["a4_tf"]],
+                    [ res_room[0]["a1_rd"],res_room[0]["a1_tf"]],
+                    [ res_room[0]["a2_rd"],res_room[0]["a2_tf"]],
+                    [ res_room[0]["a3_rd"],res_room[0]["a3_tf"]],
+                    [ res_room[0]["a4_rd"],res_room[0]["a4_tf"]],
                   ]
             voted_atq = [res_room[0]["r1_a1"],res_room[0]["r1_a2"]]
             vp_atq = res_room[0]["vp_atq"]
@@ -609,10 +625,10 @@ def Atq_Menu(db,intcmd,user,flag):
         #第2轮鉴宝    
         elif 10<= game_state <=12 :
             atq = [
-                	[ res_room[0]["a5_rd"],res_room[0]["a5_tf"],res_room[0]["a5_state"]],
-                	[ res_room[0]["a6_rd"],res_room[0]["a6_tf"],res_room[0]["a6_state"]],
-                	[ res_room[0]["a7_rd"],res_room[0]["a7_tf"],res_room[0]["a7_state"]],
-                	[ res_room[0]["a8_rd"],res_room[0]["a8_tf"],res_room[0]["a8_state"]],
+                    [ res_room[0]["a5_rd"],res_room[0]["a5_tf"],res_room[0]["a5_state"]],
+                    [ res_room[0]["a6_rd"],res_room[0]["a6_tf"],res_room[0]["a6_state"]],
+                    [ res_room[0]["a7_rd"],res_room[0]["a7_tf"],res_room[0]["a7_state"]],
+                    [ res_room[0]["a8_rd"],res_room[0]["a8_tf"],res_room[0]["a8_state"]],
                   ]
             if flag:
                 if this_player[0]["color"] != cur_player:
@@ -848,10 +864,10 @@ def Atq_Menu(db,intcmd,user,flag):
         #第2轮录入鉴宝结果    
         elif 14 <= game_state <= 16 :
             atq = [
-                	[ res_room[0]["a5_rd"],res_room[0]["a5_tf"]],
-                	[ res_room[0]["a6_rd"],res_room[0]["a6_tf"]],
-                	[ res_room[0]["a7_rd"],res_room[0]["a7_tf"]],
-                	[ res_room[0]["a8_rd"],res_room[0]["a8_tf"]],
+                    [ res_room[0]["a5_rd"],res_room[0]["a5_tf"]],
+                    [ res_room[0]["a6_rd"],res_room[0]["a6_tf"]],
+                    [ res_room[0]["a7_rd"],res_room[0]["a7_tf"]],
+                    [ res_room[0]["a8_rd"],res_room[0]["a8_tf"]],
                   ]
             vp_atq = res_room[0]["vp_atq"]         
             voted_atq = [res_room[0]["r2_a1"],res_room[0]["r2_a2"]]
@@ -912,10 +928,10 @@ def Atq_Menu(db,intcmd,user,flag):
         #第3轮鉴宝    
         elif 17<= game_state <=19 :
             atq = [
-                	[ res_room[0]["a9_rd"],res_room[0]["a9_tf"],res_room[0]["a9_state"]],
-                	[ res_room[0]["a10_rd"],res_room[0]["a10_tf"],res_room[0]["a10_state"]],
-                	[ res_room[0]["a11_rd"],res_room[0]["a11_tf"],res_room[0]["a11_state"]],
-                	[ res_room[0]["a12_rd"],res_room[0]["a12_tf"],res_room[0]["a12_state"]],
+                    [ res_room[0]["a9_rd"],res_room[0]["a9_tf"],res_room[0]["a9_state"]],
+                    [ res_room[0]["a10_rd"],res_room[0]["a10_tf"],res_room[0]["a10_state"]],
+                    [ res_room[0]["a11_rd"],res_room[0]["a11_tf"],res_room[0]["a11_state"]],
+                    [ res_room[0]["a12_rd"],res_room[0]["a12_tf"],res_room[0]["a12_state"]],
                   ]
             if flag:
                 if this_player[0]["color"] != cur_player:
@@ -1151,10 +1167,10 @@ def Atq_Menu(db,intcmd,user,flag):
         #第3轮录入鉴宝结果    
         elif 21 <= game_state <= 23 :
             atq = [
-                	[ res_room[0]["a9_rd"],res_room[0]["a9_tf"]],
-                	[ res_room[0]["a10_rd"],res_room[0]["a10_tf"]],
-                	[ res_room[0]["a11_rd"],res_room[0]["a11_tf"]],
-                	[ res_room[0]["a12_rd"],res_room[0]["a12_tf"]],
+                    [ res_room[0]["a9_rd"],res_room[0]["a9_tf"]],
+                    [ res_room[0]["a10_rd"],res_room[0]["a10_tf"]],
+                    [ res_room[0]["a11_rd"],res_room[0]["a11_tf"]],
+                    [ res_room[0]["a12_rd"],res_room[0]["a12_tf"]],
                   ]
             vp_atq = res_room[0]["vp_atq"]          
             voted_atq = [res_room[0]["r3_a1"],res_room[0]["r3_a2"]]
@@ -1280,8 +1296,8 @@ def Atq_Menu(db,intcmd,user,flag):
                 if check_obj:
                     return u"有玩家尚未选择请耐心等待！\n"+Atq_Menu(db,intcmd,user,1)
                 else:
-                	db.update('rooms', where="id = "+str(room_id)+"", state = game_state + 1)
-                	return u"鉴人目标选择完成！\n"+Atq_Menu(db,intcmd,user,1)
+                    db.update('rooms', where="id = "+str(room_id)+"", state = game_state + 1)
+                    return u"鉴人目标选择完成！\n"+Atq_Menu(db,intcmd,user,1)
             else:
                 return Atq_Menu(db,intcmd,user,1)
         #输出终局信息        
@@ -1294,7 +1310,7 @@ def Atq_Menu(db,intcmd,user,flag):
 def room_create(db,intcmd,user):
     '创建房间函数'
     if intcmd > 8 or intcmd < 6:
-    	return u"游戏人数超出范围\n"+Atq_Menu(db,intcmd,user,1)
+        return u"游戏人数超出范围\n"+Atq_Menu(db,intcmd,user,1)
     #生成随机6位房间号
     room_id = int(random.randrange(100000,999999,1))
     while list(db.select('rooms' , where="id = \'"+str(room_id)+"\'")):
@@ -1318,7 +1334,7 @@ def room_create(db,intcmd,user):
              )
     #创建玩家表
     db.insert('players', id = user, room = room_id, flag = 0, color = 0, role = 0, mate = 0, r1_state = 0, r2_state = 0, r3_state = 0,r1_skill_obj=99, r2_skill_obj=99, r3_skill_obj=99, player_obj = 0 )
-    return u"创建"+str(intcmd)+u"人房间成功！你的房间号是"+str(room_id)+"\n"+Atq_Menu(db,intcmd,user,1)
+    return u"创建"+str(intcmd)+u"人房间成功！"+Atq_Menu(db,intcmd,user,1)
 
 def room_join(db,intcmd,user):
     '加入房间函数'
@@ -1334,7 +1350,7 @@ def room_join(db,intcmd,user):
         else:
             #创建玩家表
             db.insert('players', id = user, room = room_id, flag = 0, color = 0, role = 0, mate = 0, r1_state = 0, r2_state = 0, r3_state = 0, r1_skill_obj=99, r2_skill_obj=99, r3_skill_obj=99, player_obj = 0)
-            return u"加入"+str(num_room)+u"人房间："+str(room_id)+u"成功！当前房间人数为"+str(num_players+1)+u"人\n"+Atq_Menu(db,intcmd,user,1)
+            return u"加入"+str(num_room)+u"人房间成功！\n"+Atq_Menu(db,intcmd,user,1)
 
 def atq_attack(db,intcmd,user,cur_round):
     '药不然偷袭函数，在数据库完成状态更新'
@@ -1460,7 +1476,7 @@ def atq_over(db,user):
            [ res_room[0]["a12_rd"],res_room[0]["a12_tf"]]
           ]
     #打印鉴宝回合结果
-    pro_text = u"房间："+str(room_id)+u" 游戏结果，观看后请输入！退出房间\n"
+    pro_text = u"游戏结束，观看后请点击菜单退出游戏\n"
     count = 1 
     for antique in atq:
         pro_text = pro_text + atq_atq(antique[0])+u"（"+atq_tf(antique[1])+u" ）"

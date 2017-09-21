@@ -1,5 +1,4 @@
-# coding: UTF-8
-#index.wsgi SAE代码入口文件，文件头必须以UTF-8编码开始
+# -*- coding: utf-8 -*-
 import os
 import web
 from WechatInterface import WechatInterface
@@ -15,9 +14,3 @@ render = web.template.render(templates_root)
 
 if __name__ == "__main__":
     app.run()
-#本地运行环境
-else:
-    import sae
-    application = sae.create_wsgi_app(app.wsgifunc())
-#SAE中Python的应用入口
-#wsgifunc（）是为Web Server Gateway Interface提供的接口
