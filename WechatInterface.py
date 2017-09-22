@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-import hashlib			#用于链接微信服务器哈希解码
-import web				#用于搭建网络框架
-import lxml				#用于解析xml型数据
-import time				#用于调用时间整合反馈xml数据包
-import os				#用于生成路径
-import Antique			#古董局中局
+import hashlib          #用于链接微信服务器哈希解码
+import web              #用于搭建网络框架
+import lxml             #用于解析xml型数据
+import time             #用于调用时间整合反馈xml数据包
+import os               #用于生成路径
+import Antique          #古董局中局
 import Mysql
-from lxml import etree	#lxml中的xml树型数据结构
+from lxml import etree  #lxml中的xml树型数据结构
 
 
 class WechatInterface:
@@ -38,7 +38,7 @@ class WechatInterface:
         if hashcode == signature:
             return echostr
         else:
-        	return "连接微信服务器失败！"
+            return "连接微信服务器失败！"
     def POST(self):        
         str_xml = web.data() #获得post来的数据
         xml = etree.fromstring(str_xml)#进行XML解析
@@ -54,7 +54,8 @@ class WechatInterface:
         if msgType == 'event':
             mscontent = xml.find("Event").text
             if mscontent == "subscribe":
-                replayText = u'感谢你关注古董局中局桌游，你有什么事情都可以给我说哦...但是回不回就是我的事啦。'
+                replayText = u'''感谢您关注古董局中局桌游！试试菜单栏就知道怎么愉快的玩耍啦。
+使用“刷新”按钮可以查看当局游戏最新信息以及操作提示。'''
                 return self.render.reply_text(fromUser,toUser,int(time.time()),replayText)
             
            #微信菜单管理
@@ -81,12 +82,11 @@ class WechatInterface:
                     return self.render.reply_text(fromUser,toUser,int(time.time()),u""+msg)
                 if keycontent == u'加入我们':
                     replayText = u'''《古董局中局》桌游玩家QQ群：596772185
-《古董局中局》桌游玩家微信群已经超过100人，可以联系客服姐姐拉你进去哦'''
+《古董局中局》桌游玩家微信群已经超过100人，请联系客服微信：18982287779 拉你进去哦'''
                     return self.render.reply_text(fromUser,toUser,int(time.time()),replayText)
                 if keycontent == u'客服':
                     replayText = u'''《古董局中局》微信客服号：18982287779
-《古董局中局》桌游客服QQ号：2943517039
-可爱的客服小姐姐马上就来哟'''
+《古董局中局》桌游客服QQ号：2943517039'''
                     return self.render.reply_text(fromUser,toUser,int(time.time()),replayText)
                 
                 

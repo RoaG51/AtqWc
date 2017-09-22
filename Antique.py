@@ -215,8 +215,8 @@ def Atq_Menu(db,intcmd,user,flag):
                 else:
                     return u"请等待房间人满后房主输入0开始游戏\n房间号："+str(room_id)+u"\n所需游戏人数："+str(num_room)+u"\n当前游戏人数："+str(num_players)+help_text
             #老齐修改符，测试完成后改成下面的一行判断
-            elif host_id == user and intcmd == 0 :
-            #elif host_id == user and intcmd == 0 and num_players >= num_room:
+            #elif host_id == user and intcmd == 0 :
+            elif host_id == user and intcmd == 0 and num_players >= num_room:
                 #更新房间状态
                 db.update('rooms', where="id = "+str(room_id)+"", state = game_state + 1 )
                 return u"开始游戏成功！\n"+Atq_Menu(db,intcmd,user,1)
